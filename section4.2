@@ -213,4 +213,275 @@
    The "typedef" statement is covered in Section 7.3.
 
    "typedef"声明会在7.3章节全面介绍。
+   
+4.2.6.  Reusable Node Groups (grouping)
+
+   Groups of nodes can be assembled into reusable collections using the
+   "grouping" statement.  A grouping defines a set of nodes that are
+   instantiated with the "uses" statement:
+
+   一组节点可以用"grouping"声明组合成一个可复用的集合。
+   一个grouping能声明一个节点集合，这个节点集合使用"uses"声明来实例引用。
+
+     grouping target {
+         leaf address {
+             type inet:ip-address;
+             description "Target IP address";
+         }
+         leaf port {
+             type inet:port-number;
+             description "Target port number";
+         }
+     }
+
+     container peer {
+         container destination {
+             uses target;
+         }
+     }
+
+   NETCONF XML Example:
+
+     <peer>
+       <destination>
+         <address>192.0.2.1</address>
+         <port>830</port>
+       </destination>
+     </peer>
+
+   The grouping can be refined as it is used, allowing certain
+   statements to be overridden.  In this example, the description is
+   refined:
+
+   分组可以在使用时得到简化，允许某些声明被重写。在这个例子里，
+   YANG简化描述了如下定义：
+
+     container connection {
+         container source {
+             uses target {
+                 refine "address" {
+                     description "Source IP address";
+                 }
+                 refine "port" {
+                     description "Source port number";
+                 }
+             }
+         }
+         container destination {
+             uses target {
+                 refine "address" {
+                     description "Destination IP address";
+                 }
+                 refine "port" {
+                     description "Destination port number";
+                 }
+             }
+         }
+     }
+
+   The "grouping" statement is covered in Section 7.11.
+   "grouping"声明会在7.11章节中全面介绍。
+
+4.2.7.  Choices
+
+   YANG allows the data model to segregate incompatible nodes into
+   distinct choices using the "choice" and "case" statements.  The
+   "choice" statement contains a set of "case" statements that define
+   sets of schema nodes that cannot appear together.  Each "case" may
+   contain multiple nodes, but each node may appear in only one "case"
+   under a "choice".
+
+   YANG允许数据模型使用"chuice"和"case"声明将互斥的node以明显的方式分离开来。
+   "choice"声明中容纳了一个"case"声明的集合，集合中每个case声明的模式node不能相同。
+   在一个chioce下，每个"case"包含多个node，但是任一个node只能出现在一个case中。
+
+   When an element from one case is created, all elements from all other
+   cases are implicitly deleted.  The device handles the enforcement of
+   the constraint, preventing incompatibilities from existing in the
+   configuration.
+
+   当一个元素在一个case下被穿件，所有在其他case下的相同元素会被隐式删除。
+   设备应该利用这个强制约束，以防止已有的配置出现不兼容。
+
+   The choice and case nodes appear only in the schema tree, not in the
+   data tree or NETCONF messages.  The additional levels of hierarchy
+   are not needed beyond the conceptual schema.
+
+   choice和case只出现在模式树种，不会这数据树或者NETCONF消息中。
+   这个附加的标准不需要在模式的概念上体现。
+
+   YANG Example:
+
+     container food {
+       choice snack {
+           case sports-arena {
+               leaf pretzel {
+                   type empty;
+               }
+               leaf beer {
+                   type empty;
+               }
+           }
+           case late-night {
+               leaf chocolate {
+                   type enumeration {
+                       enum dark;
+                       enum milk;
+                       enum first-available;
+                   }
+               }
+           }
+       }
+    }
+
+   NETCONF XML Example:
+
+     <food>
+       <pretzel/>
+       <beer/>
+     </food>
+
+   The "choice" statement is covered in Section 7.9.
+
+   "chioce"声明会在7.9章节中全面介绍。
+
+4.2.8.  Extending Data Models (augment)
+
+   YANG allows a module to insert additional nodes into data models,
+   including both the current module (and its submodules) or an external
+   module.  This is useful for example for vendors to add vendor-
+   specific parameters to standard data models in an interoperable way.
+
+   YANG允许一个模块向数据模型中添加附加的节点，包括添加本身模块(和他的子模块)
+   或者一个外部的模块。这是一个有用的特性，例如供应商们以协同工作的方式
+   向基本数据模型添加厂商指定的参数。
+
+   The "augment" statement defines the location in the data model
+   hierarchy where new nodes are inserted, and the "when" statement
+   defines the conditions when the new nodes are valid.
+
+   "augment"声明定义新节点加入到数据模型层级中的位置，"when"声明定义
+   新节点加入的条件。
+
+   YANG Example:
+
+     augment /system/login/user {
+         when "class != 'wheel'";
+         leaf uid {
+             type uint16 {
+                 range "1000 .. 30000";
+             }
+         }
+     }
+
+   This example defines a "uid" node that only is valid when the user's
+   "class" is not "wheel".
+   这个例子定义了一个uid节点，条件是当user的class的值不是"wheel"。
+
+   If a module augments another module, the XML representation of the
+   data will reflect the prefix of the augmenting module.  For example,
+   if the above augmentation were in a module with prefix "other", the
+   XML would look like:
+
+   如果向一个模块中加入另一个模块，数据的XML表达式会映射原模块的前缀。
+   例如，一个前缀是other的模块使用了上面的YANG扩展，它的XML会像这样：
+
+   NETCONF XML Example:
+
+     <user>
+       <name>alicew</name>
+       <full-name>Alice N. Wonderland</full-name>
+       <class>drop-out</class>
+       <other:uid>1024</other:uid>
+     </user>
+
+   The "augment" statement is covered in Section 7.15.
+
+   augment声明会在7.15章节全面介绍。
+
+4.2.9.  RPC Definitions
+
+   YANG allows the definition of NETCONF RPCs.  The operations' names,
+   input parameters, and output parameters are modeled using YANG data
+   definition statements.
+
+   YANG支持NETCONF的RPC定义。YANG使用YANG的数据定义声明来对操作名称，入参，
+   出参进行建模。
+
+
+YANG Example:
+
+     rpc activate-software-image {
+         input {
+             leaf image-name {
+                 type string;
+             }
+         }
+         output {
+             leaf status {
+                 type string;
+             }
+         }
+     }
+
+   NETCONF XML Example:
+
+     <rpc message-id="101"
+          xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <activate-software-image xmlns="http://acme.example.com/system">
+         <image-name>acmefw-2.3</image-name>
+      </activate-software-image>
+     </rpc>
+
+     <rpc-reply message-id="101"
+                xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+       <status xmlns="http://acme.example.com/system">
+         The image acmefw-2.3 is being installed.
+       </status>
+     </rpc-reply>
+
+   The "rpc" statement is covered in Section 7.13.
+
+   "rpc"声明会在7.13章节全面介绍。
+
+4.2.10.  Notification Definitions
+
+   YANG allows the definition of notifications suitable for NETCONF.
+   YANG data definition statements are used to model the content of the
+   notification.
+
+   YANG支持NETCONF通知的定义。YANG的数据定义声明用于对通知的内容进行建模。
+
+   YANG Example:
+
+     notification link-failure {
+         description "A link failure has been detected";
+         leaf if-name {
+             type leafref {
+                 path "/interface/name";
+             }
+         }
+         leaf if-admin-status {
+             type admin-status;
+         }
+         leaf if-oper-status {
+             type oper-status;
+         }
+     }
+
+   NETCONF XML Example:
+
+     <notification
+         xmlns="urn:ietf:params:netconf:capability:notification:1.0">
+       <eventTime>2007-09-01T10:00:00Z</eventTime>
+       <link-failure xmlns="http://acme.example.com/system">
+         <if-name>so-1/2/3.0</if-name>
+         <if-admin-status>up</if-admin-status>
+         <if-oper-status>down</if-oper-status>
+       </link-failure>
+     </notification>
+
+   The "notification" statement is covered in Section 7.14.
+
+   "notification"声明会在7.14章节全面介绍。
 
