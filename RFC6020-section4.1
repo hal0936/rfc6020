@@ -1,0 +1,132 @@
+4.1 Functional Overview
+
+   YANG is a language used to model data for the NETCONF protocol.  A
+   YANG module defines a hierarchy of data that can be used for NETCONF-
+   based operations, including configuration, state data, Remote
+   Procedure Calls (RPCs), and notifications.  This allows a complete
+   description of all data sent between a NETCONF client and server.
+
+   YANG是一种语言，用于对NETCONF协议（译注：基于xml的网络配置协议）进行建模。
+   一个YANG module定义一个数据等级，用于网络配置的基本操作，包括配置、状态数据、
+   RemoteProcedureCalls（向远端产品发送请求程序）以及通知。这可以让NETCONF的
+   client和server端的数据发送得到完整的描述。
+
+   YANG models the hierarchical organization of data as a tree in which
+   each node has a name, and either a value or a set of child nodes.
+   YANG provides clear and concise descriptions of the nodes, as well as
+   the interaction between those nodes.
+
+   YANG模型以树形的结构组织数据的等级结构，在这个结构里，每个节点拥有一个名称并且
+   拥有一个值或者一个子节点。YANG为节点提供了简洁明了的描述，以及节点之间的相互关系。
+
+   YANG structures data models into modules and submodules.  A module
+   can import data from other external modules, and include data from
+   submodules.  The hierarchy can be augmented, allowing one module to
+   add data nodes to the hierarchy defined in another module.  This
+   augmentation can be conditional, with new nodes appearing only if
+   certain conditions are met.
+
+   YANG以模块和子模块的形式组织数据模型。一个模块可以从另一个外部模块输入数据，
+   YANG的等级可以被扩展，并且允许一个模块将数据添加到另一个模块的等级结构里。
+   这个扩展是有条件的，新节点的出现必须满足某些条件（！！！）。
+
+   YANG models can describe constraints to be enforced on the data,
+   restricting the appearance or value of nodes based on the presence or
+   value of other nodes in the hierarchy.  These constraints are
+   enforceable by either the client or the server, and valid content
+   MUST abide by them.
+
+   YANG模型可以描述对数据执行强制操作的约束条件，节点表示以及值的约束基于
+   等级结构中的其他节点。这些约束在client或者server端都是被强制执行的，并且有效的
+   内容必须遵循这些约束。
+
+   YANG defines a set of built-in types, and has a type mechanism
+   through which additional types may be defined.  Derived types can
+   restrict their base type's set of valid values using mechanisms like
+   range or pattern restrictions that can be enforced by clients or
+   servers.  They can also define usage conventions for use of the
+   derived type, such as a string-based type that contains a host name.
+
+   YANG定义了一套内置的类型，并且通过定义附加类型实现类型约束。衍生的类型
+   使用范围或者模式等约束，可以在client或者server端约束它们基本类型的有效值范围。
+   它们还可以定义衍生类型的常规用法，比如一个字符串类型需要包含一个主机名。
+
+   YANG permits the definition of reusable groupings of nodes.  The
+   instantiation of these groupings can refine or augment the nodes,
+   allowing it to tailor the nodes to its particular needs.  Derived
+   types and groupings can be defined in one module or submodule and
+   used in either that location or in another module or submodule that
+   imports or includes it.
+
+   YANG允许定义可复用的节点分组，这些分组的实例化可以精简或者扩充节点，
+   根据需求对节点进行定制。派生类型和分组可以定义在一个模块或者子模块中，它们
+   可以在本模块或者其他将它们引入(import)或者包含(include)的模块或者子模块中被使用。
+
+
+   YANG data hierarchy constructs include defining lists where list
+   entries are identified by keys that distinguish them from each other.
+   Such lists may be defined as either sorted by user or automatically
+   sorted by the system.  For user-sorted lists, operations are defined
+   for manipulating the order of the list entries.
+
+   YANG的数据层级以定义链表来实现，表项以关键字作为索引来区分彼此。
+   链表排序可能根据用户定义或者系统自动排序。用户定义排序的链表，
+   表项的排序操作将需要被定义。
+
+   YANG modules can be translated into an equivalent XML syntax called
+   YANG Independent Notation (YIN) (Section 11), allowing applications
+   using XML parsers and Extensible Stylesheet Language Transformations
+   (XSLT) scripts to operate on the models.  The conversion from YANG to
+   YIN is lossless, so content in YIN can be round-tripped back into
+   YANG.
+
+   YANG模块可以被翻译成等级的XML语法，称为YANG独立标识（YANG Independent Notation，YIN），
+   允许应用程序使用XML解析器和可扩展样式表语言转换
+   （Extensible Stylesheet Language Transformations，ESLT）脚本对这些模块进行操作。
+   从YANG翻译成YIN是无损的，所以YIN内容可以再次转换回YANG.
+
+   YANG strikes a balance between high-level data modeling and low-level
+   bits-on-the-wire encoding.  The reader of a YANG module can see the
+   high-level view of the data model while understanding how the data
+   will be encoded in NETCONF operations.
+
+   YANG在上层数据建模和底层数据编码之间取得平衡，YANG模块的阅读者可以看到上层的数据模型
+   同时能理解在NETCONF操作中数据是如何被编码的。
+
+   YANG is an extensible language, allowing extension statements to be
+   defined by standards bodies, vendors, and individuals.  The statement
+   syntax allows these extensions to coexist with standard YANG
+   statements in a natural way, while extensions in a YANG module stand
+   out sufficiently for the reader to notice them.
+
+   YANG是一种可扩展语言，允许标准组织、厂商和私人定义扩展声明。YANG的声明语法允许
+   那些扩展与标准YANG声明天然共存，儿在一个YANG模块中的扩展能显而易见地让读者识别出来。
+
+   YANG resists the tendency to solve all possible problems, limiting
+   the problem space to allow expression of NETCONF data models, not
+   arbitrary XML documents or arbitrary data models.  The data models
+   described by YANG are designed to be easily operated upon by NETCONF
+   operations.
+
+   YANG不会试图解决有可能出现的问题，它以仅支持NETCONF数据模型表达式的方式，来限制问题的的区间，
+   不像随意的XML文件或者随意的数据模型。
+
+   To the extent possible, YANG maintains compatibility with Simple
+   Network Management Protocol's (SNMP's) SMIv2 (Structure of Management
+   Information version 2 [RFC2578], [RFC2579]).  SMIv2-based MIB modules
+   can be automatically translated into YANG modules for read-only
+   access.  However, YANG is not concerned with reverse translation from
+   YANG to SMIv2.
+
+   尽可能地，YANG包含了对简单网络管理协议（Simple Network Management Protocol）的
+   SMIv2-based MIB模型。SMIv2-based MIB模块可以在只读模式自动地翻译成YANG模型。
+   然而，YANG不能确保从YANG到SMIv2-based的回译。
+
+
+   Like NETCONF, YANG targets smooth integration with the device's
+   native management infrastructure.  This allows implementations to
+   leverage their existing access control mechanisms to protect or
+   expose elements of the data model.
+
+   像NETCONF一样，YANG致力于与设备原生的管理接口平稳集成。遵循YANG的实现允许原有访问控制机制
+   权衡数据模型中受保护或者暴露在外的部分。
