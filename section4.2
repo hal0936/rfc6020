@@ -1,6 +1,5 @@
 4.2.  Language Overview
 
-
    This section introduces some important constructs used in YANG that
    will aid in the understanding of the language specifics in later
    sections.  This progressive approach handles the inter-related nature
@@ -9,3 +8,209 @@
 
    这个章节介绍一些YANG中用到的重要概念，目的是帮助理解后续章节中说到的语言特性。
    这些先进的方式掌控着YANG观念和思想的内在根本。对YANG声明和语法的详细描述从第七章开始。
+   
+   4.2.1.  Modules and Submodules
+
+   A module contains three types of statements: module-header
+   statements, revision statements, and definition statements.  The
+   module header statements describe the module and give information
+   about the module itself, the revision statements give information
+   about the history of the module, and the definition statements are
+   the body of the module where the data model is defined.
+
+   一个模块包含3中类型的声明：模块头部声明，修正声明，和定义声明。
+   模块头部声明描述了这个模块并且给出这个模块自己的信息，
+   修正声明给出关于这个模块的历史信息，定义声明是这个模块的数据模型定义的主体。
+
+   A NETCONF server may implement a number of modules, allowing multiple
+   views of the same data, or multiple views of disjoint subsections of
+   the device's data.  Alternatively, the server may implement only one
+   module that defines all available data.
+
+   一个NETCONF服务可能实现很多模块，允许对同一数据多视图，或者对多段不相关的设备数据多视图。
+   或者，NETCONF服务可能对只实现了一个模块来定义所有的可用数据。
+
+   A module may be divided into submodules, based on the needs of the
+   module owner.  The external view remains that of a single module,
+   regardless of the presence or size of its submodules.
+
+   一个模块可以根据用户模块使用者的需求，切分成多个子模块。
+   忽略它的形式以及子模块的大小，从外部看来它是一个单独的模块。
+
+   The "include" statement allows a module or submodule to reference
+   material in submodules, and the "import" statement allows references
+   to material defined in other modules.
+
+   "include"声明允许一个模块或者子模块从子模块中引用元素，"import"声明允许
+   引用其他模块的元素。
+
+4.2.2.  Data Modeling Basics
+
+   YANG defines four types of nodes for data modeling.  In each of the
+   following subsections, the example shows the YANG syntax as well as a
+   corresponding NETCONF XML representation.
+
+   YANG为数据模型定义了4种类型的节点。在接下来4个子章节里，那里例子将展示
+   与NETCONF XML相对应的YANG语法。
+
+
+4.2.2.1.  Leaf Nodes
+
+   A leaf node contains simple data like an integer or a string.  It has
+   exactly one value of a particular type and no child nodes.
+
+   一个包含类似整形或者字符串的简单数据的叶子节点。它只有一个指定了
+   特定类型的值并且没有子节点。
+
+   YANG Example:
+
+       leaf host-name {
+           type string;
+           description "Hostname for this system";
+       }
+
+   NETCONF XML Example:
+
+       <host-name>my.example.com</host-name>
+
+   The "leaf" statement is covered in Section 7.6.
+
+   "leaf"声明会在7.6章节全面介绍。
+
+4.2.2.2.  Leaf-List Nodes
+
+   A leaf-list is a sequence of leaf nodes with exactly one value of a
+   particular type per leaf.
+
+   叶子列表是一个叶子节点的序列，每个叶子拥有一个确切的特定类型的值。
+
+   YANG Example:
+
+     leaf-list domain-search {
+         type string;
+         description "List of domain names to search";
+     }
+
+   NETCONF XML Example:
+
+     <domain-search>high.example.com</domain-search>
+     <domain-search>low.example.com</domain-search>
+     <domain-search>everywhere.example.com</domain-search>
+
+   The "leaf-list" statement is covered in Section 7.7.
+   "leaf-list"声明会在7.7章节全面介绍。
+
+4.2.2.3.  Container Nodes
+
+   A container node is used to group related nodes in a subtree.  A
+   container has only child nodes and no value.  A container may contain
+   any number of child nodes of any type (including leafs, lists,
+   containers, and leaf-lists).
+
+   容器节点用于组织一棵子树中的关联节点。一个容器节点只包含无值的子节点。
+   一个容器节点可以包含任意数量任意类型(包括叶子、链表、容器，和列子列表)的子节点。
+
+   YANG Example:
+
+     container system {
+         container login {
+             leaf message {
+                 type string;
+                 description
+                     "Message given at start of login session";
+             }
+         }
+     }
+
+   NETCONF XML Example:
+
+     <system>
+       <login>
+         <message>Good morning</message>
+       </login>
+     </system>
+
+   The "container" statement is covered in Section 7.5.
+   "container"章节会在7.5章节全面介绍。
+
+4.2.2.4.  List Nodes
+
+   A list defines a sequence of list entries.  Each entry is like a
+   structure or a record instance, and is uniquely identified by the
+   values of its key leafs.  A list can define multiple key leafs and
+   may contain any number of child nodes of any type (including leafs,
+   lists, containers etc.).
+
+   一个列表定义了一个列表项的序列。每一个项都像是一个结构或者一条记录的实例，
+   并且以它的键值叶子的值作为唯一标识。一个列表可以定义多个键值叶子并且可以包含
+   任意数量任意类型(包括叶子，列表，容器等)的子节点。
+
+   YANG Example:
+
+     list user {
+         key "name";
+         leaf name {
+             type string;
+         }
+         leaf full-name {
+             type string;
+         }
+         leaf class {
+             type string;
+         }
+     }
+
+   NETCONF XML Example:
+
+     <user>
+       <name>glocks</name>
+       <full-name>Goldie Locks</full-name>
+       <class>intruder</class>
+     </user>
+     <user>
+       <name>snowey</name>
+       <full-name>Snow White</full-name>
+       <class>free-loader</class>
+     </user>
+     <user>
+       <name>rzell</name>
+       <full-name>Rapun Zell</full-name>
+       <class>tower</class>
+     </user>
+
+   The "list" statement is covered in Section 7.8.
+   "list"声明会在7.8章节全面介绍。
+
+
+4.2.5.  Derived Types (typedef)
+
+   YANG can define derived types from base types using the "typedef"
+   statement.  A base type can be either a built-in type or a derived
+   type, allowing a hierarchy of derived types.
+
+   YNAG可以以基本类型为基础，使用"typedef"声明衍生类型。一个基本类型可以是
+   一个内置类型或者一个衍生类型，允许定义多层的衍生类型。
+
+   A derived type can be used as the argument for the "type" statement.
+
+   YANG Example:
+
+     typedef percent {
+         type uint8 {
+             range "0 .. 100";
+         }
+         description "Percentage";
+     }
+
+     leaf completed {
+         type percent;
+     }
+
+   NETCONF XML Example:
+
+     <completed>20</completed>
+
+   The "typedef" statement is covered in Section 7.3.
+
+   "typedef"声明会在7.3章节全面介绍。
+
